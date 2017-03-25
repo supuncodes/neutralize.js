@@ -1,9 +1,10 @@
 
-##### Neutralize.JS is a Functional Reactive Programming Framework.
+## What is Neutralize.JS
 
-Functional Reactive programming (FRP) is a programming paradigm that enables the developers to reduce the complexity of asynchronous and event-driven programming and enables the developers to write more readable, and maintainable code. In other words asynchronous callbacks and events are represented as data streams and Functional Programming is used manipulate such streams.
+Neutralize.JS is a Functional Reactive Programming Framework which simplifies the developers to write business applications with Functional Reactive Programming (FRP).
 
-However this programming paradigm is not widely used to write business applications. Neutralize.JS simplifies the developers to write their business applications with FRP.
+FRP is a programming paradigm that enables the developers to reduce the complexity of asynchronous and event-driven programming and enables the developers to write more readable, and maintainable code. In other words asynchronous callbacks and events are represented as data streams and Functional Programming is used manipulate such streams.
+
 
 
 ## Quick Overview of FRP for Absolute Beginners
