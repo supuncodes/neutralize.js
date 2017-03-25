@@ -18,5 +18,5 @@ O_o
 .Observable
 .fromEvent("#idButton", "click")
 .map(event=>event.type)
-.buffer(3)
+.bufferWithTimeAndCount(1000,3)
 .subscribe(n=>console.log(n));
