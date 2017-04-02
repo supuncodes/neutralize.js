@@ -50,18 +50,29 @@
         });
     });
 
+    n.operator ("reactiveCount", function(prevObs, newObs, func){
+        var count=0;
+        prevObs.onNext(function(item){ 
+            count++;           
+            newObs.push(count);
+        });
+    });
 
-    n.operator ("join", function(prevObs, newObs, func){
+
+    n.operator ("join", function(prevObs, newObs){
         var args = [];
-        if (arguments.length > 2)
-            args = arguments.splice(1,1);
+        if (arguments.length > 2){
+            for (var i=0;i<arguments.length;i++)
+            if (i!=1)
+                args.push(arguments[i]);
+        }
         
         var nextFunc = function(item){
             newObs.push(item);
         };
 
         for (var i=0;i<args.length; i++)
-            args[i].onNext(newObs);   
+            args[i].onNext(nextFunc);   
     });
 
     n.operator ("zip", function(prevObs, newObs, nextObs){
@@ -96,27 +107,29 @@
 
     });
 
-    n.operator ("reactiveSum", function(prevObs, newObs, nextObs,threeObs, func){
+    n.operator ("reactiveSum", function(prevObs, newObs, nextObs, func){
 
-        var v1,v2;
-        
-        function evaluate(){
+        var valueObj = {1:0,2:0};
+       
+        function evaluate(item,index){
+            valueObj[index] = item;
+            var v1 = valueObj["1"];
+            var v2 = valueObj["2"];
+
             if (v1 && v2){
                 if (func)
-                    newObs.onNext (func(v1, v2));
+                    newObs.push (func(v1, v2));
                 else 
-                    newObs.onNext (v1 + v2);
+                    newObs.push (v1 + v2);
             }
         }
-        
-        threeObs.onNext(function(item){            
-            v1 = item;
-            evaluate();
+ 
+        prevObs.onNext(function(item){         
+            evaluate(item,"1");
         });
         
         nextObs.onNext(function(item){            
-            v2 = item;
-            evaluate();
+            evaluate(item,"2");
         });
 
     });

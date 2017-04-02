@@ -251,24 +251,23 @@
         return outObj;
     }
 
-    var listenerFactory = {};
-
     var nuObj = {
         listener: function(name, func){
             components.listeners[name] = function(){
                 var obs = new Observable();
                 args = helpers.argsWithObservable(obs, arguments);                
+                
+                var evalStr = "var newFunc = func.bind(this";
+                for (var i=0;i<args.length;i++)
+                evalStr += ",args[" + i +"]";
+                eval(evalStr + ")");
+
                 obs.onSubscribed(function(){
-                    func.apply(this,args);
+                    newFunc.apply();
                 });
 
                 return obs;
             }
-
-            listenerFactory[name] = function(){
-                return new (Function.prototype.bind.apply(components.listeners[name], arguments));
-            }
-            
         },
         terminator: function(name, func){
             components.terminators[name] = func;
@@ -276,7 +275,7 @@
         operator: function(name, func){
             components.operators[name] = func;
         },
-        Observable: listenerFactory,
+        Observable: components.listeners,
         newObservable: function(){
             return new Observable();
         }
