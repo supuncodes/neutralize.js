@@ -1,0 +1,20 @@
+{
+  "name": "neutralize.js",
+  "version": "0.1.1",
+  "description": "Neutralize.js - A Functional Reactive Programming Library",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/supuncodes/neutralize.js.git"
+  },
+  "keywords": [
+    "Functional",
+    "Reactive",
+    "Programming"
+  ],
+  "author": "Supun Dissanayake",
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/supuncodes/neutralize.js/issues"
+  },
+  "homepage": "https://github.com/supuncodes/neutralize.js#readme"
+}
