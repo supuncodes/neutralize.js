@@ -9,18 +9,34 @@
 	}
 
     var components = {
+        listeners:{},
         operators:{},
         terminators:{}
-    }
-
-    var observableCreators = {}
+    };
 
     var helpers = {
         argsWithObservable: function (obs, argus){
             var args = Array.isArray(obs) ? obs : [obs];
+                                  
             for (i=0;i<argus.length;i++)
                 args.push(argus[i]);
             return args;
+        },
+        createDefaultCallbacks: function(prevObs, newObs){
+            if (!prevObs.hasNextCallback())
+            prevObs.onNext(function (item){
+                newObs.push(item);
+            });
+
+            if (!prevObs.hasErrorCallback())
+            prevObs.onError(function (item){
+                newObs.pushError(item);
+            });
+
+            if (!prevObs.hasCompleteCallback())
+            prevObs.onComplete(function (item){
+                newObs.complete(item);
+            });
         }
     }
 
@@ -158,6 +174,15 @@
             onComplete: function(f){
                 events.onComplete = f;
             },
+            hasNextCallback: function(){
+                return events.onNext;
+            },
+            hasErrorCallback: function(){
+                return events.onError;
+            },
+            hasCompleteCallback: function(){
+                return events.onComplete;
+            },
             bufferItem: function(item){
                 if (!buffer)
                     buffer = new ObservableBuffer(this);
@@ -193,22 +218,26 @@
             
             pObj[key] = function(){
                 var args,obs;
+                var observables;
                 if (type === "OPERATOR"){
                     obs = new Observable();
-                    args = helpers.argsWithObservable([pObj, obs], arguments);
+                    observables = [pObj, obs];
                 } 
                 else 
-                    args = helpers.argsWithObservable(pObj, arguments);
-                               
+                    observables = pObj;
+
+                args = helpers.argsWithObservable(observables, arguments);
+ 
                 if (!obs){
-                    func.apply(this,args);
+                    return func.apply(this,args);
                 }else{
                     obs.onSubscribed(function(){
                         func.apply(this,args);
+                        helpers.createDefaultCallbacks(pObj, obs);
                     });
+                    
+                    return obs;
                 }
-               
-                return obs;
             }
         }
 
@@ -222,10 +251,11 @@
         return outObj;
     }
 
+    var listenerFactory = {};
+
     var nuObj = {
         listener: function(name, func){
-
-            observableCreators[name] = function(){
+            components.listeners[name] = function(){
                 var obs = new Observable();
                 args = helpers.argsWithObservable(obs, arguments);                
                 obs.onSubscribed(function(){
@@ -233,6 +263,10 @@
                 });
 
                 return obs;
+            }
+
+            listenerFactory[name] = function(){
+                return new (Function.prototype.bind.apply(components.listeners[name], arguments));
             }
             
         },
@@ -242,9 +276,12 @@
         operator: function(name, func){
             components.operators[name] = func;
         },
-        Observable: observableCreators
+        Observable: listenerFactory,
+        newObservable: function(){
+            return new Observable();
+        }
         
     }
 
-    base.O_o = nuObj;
+    base.Nx = nuObj;
 })()
